@@ -11,6 +11,9 @@ import br.com.caelum.estoque.modelo.item.Filtro;
 import br.com.caelum.estoque.modelo.item.Filtros;
 import br.com.caelum.estoque.modelo.item.Item;
 import br.com.caelum.estoque.modelo.item.ItemDao;
+import br.com.caelum.estoque.modelo.usuario.TokenDao;
+import br.com.caelum.estoque.modelo.usuario.TokenUsuario;
+import br.com.caelum.estoque.modelo.usuario.Usuario;
 
 @WebService//anotação utilizada para dizer que é um webService
 public class EstoqueWS {
@@ -36,6 +39,33 @@ public class EstoqueWS {
 		
 		
 		return itensResultado;
+	}
+	
+	/*Metodo para cadastrar um item e retornar esse item cadastrado
+	 * obs: header = true coloca esse parâmtro no cabeçalho do xml*/
+	
+	@WebMethod(operationName = "CadastrarItem")//altera o nome do método no XML
+	@WebResult(name="item")//altera o nome do retorno
+	public Item cadastrarItem(@WebParam(name="tokenUsuario",header = true) TokenUsuario token, @WebParam(name="item") Item item) throws AutorizacaoException{
+		
+		System.out.println("Cadastrando um item" + item);
+		
+		//validando se o token é valido
+		
+		boolean ehValido = new TokenDao().ehValido(token);
+		
+		//se o token não for válido será lançada uma execption
+		if (!ehValido) {
+			
+			throw new AutorizacaoException("Falha de Autorização");
+			
+			
+		}
+		
+		this.dao.cadastrar(item);
+		
+		
+		return item;
 	}
 
 }
